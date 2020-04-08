@@ -1,5 +1,5 @@
 import math
-from BasicClientActorAbs import BasicClientActorAbs
+from client_side.BasicClientActorAbs import BasicClientActorAbs
 
 class BasicClientActor(BasicClientActorAbs):
 
