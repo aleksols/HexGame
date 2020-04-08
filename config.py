@@ -5,6 +5,6 @@ board = {
 
 network = {
     "layers": [],
-    "dimensions": [],
+    "dimensions": [board["size"] + 1],
     "activations": []
 }
