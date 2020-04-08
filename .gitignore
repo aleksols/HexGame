@@ -1,5 +1,7 @@
 client_side/
 !client_side/Client_side/BasicClientActor.py
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
