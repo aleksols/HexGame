@@ -1,4 +1,4 @@
-client_side/
+client_side/*
 !client_side/Client_side/BasicClientActor.py
 .idea/
 
