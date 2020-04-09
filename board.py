@@ -1,78 +1,68 @@
 import math
-
+import numpy as np
 from cell import Cell
 
 
 class Board:
 
-    def __init__(self, size):
+    def __init__(self, size, starting_player):
         self.cells = []
         self.size = size
-        self.init_cells()
+        self.coord_repr = {}  # A coordinate based representation of cells
+        self.init_cells_v2()
 
+        self.player = starting_player
+        self.stones_places = 0
 
-    def init_cells(self):
-        counter = 0
-        for row in range(0, self.size):
-            new_cells = []
-            for column in range(0, self.size):
+    def init_cells_v2(self):
+        col_vector = np.array([1, -1])
+        row_vector = np.array([-1, -1])
 
-                #  See rotation matrix on Wikipedia if ever in doubt about this calculation
-                angle = -math.pi / 4
-                x_pos = column
-                y_pos = -row
-                x = x_pos * math.cos(angle) - y_pos * math.sin(angle)
-                y = x_pos * math.sin(angle) + y_pos * math.cos(angle)
-                cell = Cell(counter, pos=(x, y), row=row, column=column)
+        # Adding cells
+        for i in range(self.size ** 2):
+            col = i % self.size
+            row = i // self.size
+            position = col * col_vector + row * row_vector
+            cell = Cell(i, pos=(position[0], position[1]), row=row, column=col)
+            self.cells.append(cell)
+            self.coord_repr[(row, col)] = cell
 
-                left_neighbour = new_cells[-1:]
-                top_neighbours = []
-                if row != 0:
-                    top_neighbours = self.cells[row - 1][column: column + 2]
-
-                neighbours = top_neighbours + left_neighbour
-
-                cell.add_neighbour(*neighbours)
-                new_cells.append(cell)
-                counter += 1
-
-            self.cells.append(new_cells)
+        # Adding neighbours
+        for cell in self.cells:
+            r = cell.row
+            c = cell.column
+            neighbour_coord = [(r - 1, c), (r - 1, c + 1), (r, c + 1), (r + 1, c), (r + 1, c - 1), (r, c - 1)]
+            for coord in neighbour_coord:
+                if coord in self.coord_repr.keys():
+                    cell.add_neighbour(self.coord_repr[coord])
 
     def set_state(self, state):
-        i = 0
-        for row in self.cells:
-            for cell in row:
-                cell.set_state(state[i])
-                i += 1
+        for i, s in enumerate(state):
+            self.cells[i].set_state(s)
 
     def reset(self):
-        for row in self.cells:
-            for cell in row:
-                cell.player = None
+        for cell in self.cells:
+            cell.player = None
+
+    def play(self, action):
+        # TODO implement
+        return None
 
     @property
     def valid_actions(self):
-        actions = []
-        for row in self.cells:
-            for cell in row:
-                if cell.player is None:
-                    actions.append(cell.index)
-        return actions
+        # TODO maybe move to state manager
+        return [i if cell.player is None else 2 for i, cell in enumerate(self.cells)]
 
     @property
     def state(self):
-        state = []
-        for row in self.cells:
-            for cell in row:
-                state.append(cell.state)
-        return state
+        # TODO implement player into state and use in play as well
+        return self.cells.copy()
 
-
+    @property
+    def final_state(self):
+        return True
 
 if __name__ == '__main__':
     b = Board(4)
-    print(b.state)
     print(b.valid_actions)
-    b.set_state([(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 1)])
-    print(b.state)
-    print(b.valid_actions)
+    b.set_state([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0])

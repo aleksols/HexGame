@@ -1,10 +1,15 @@
-board = {
+from tensorflow.keras.layers import Dense
+
+general = {
     "size": 4,
+    "starting player": 1,
 }
 
 
 network = {
-    "layers": [],
-    "dimensions": [board["size"] + 1],
-    "activations": []
+    "layers": [Dense, Dense, Dense],
+    "dimensions": [general["size"] ** 2 + 1, 64, 32, general["size"] ** 2],
+    "activations": ["relu", "relu", "softmax"],
+    "optimizer": "adam",
+    "loss": "categorical_crossentropy"
 }
