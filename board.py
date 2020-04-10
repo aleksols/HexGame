@@ -79,9 +79,6 @@ class Board:
 
     @property
     def finished(self):
-        # if not self.valid_actions:
-        #     return True
-
         # Previous and next player are the same, only the previous player could have won
         finished_player = self.next_player
         return self._player_one_finished() if finished_player == 1 else self._player_two_finished()
@@ -149,21 +146,10 @@ if __name__ == '__main__':
     print("State", b.state)
     import random
 
-    # p1_actions = [0, 2, 4, 6, 8]
-    # p2_actions = [1, 2, 3, 5, 7]
-    # actions = []
-    # for p1, p2 in zip(p1_actions, p2_actions):
-    #     actions += [p1, p2]
-    # actions = [0, 3, 4, 1, 7, 6, 5, 8, 2]
     for i in range(1000):
         while not b.finished:
-            # if actions:
-            # b.play(actions.pop(0))
-            # else:
-            #     print("Using random")
+
             b.play(random.choice(b.valid_actions))
-            # print(b.state)
-        # for i in range(1, b.size ** 2, b.size):
-        #     print(b.state[i: i + b.size])
+
         b.reset()
     print(time.time() - start)

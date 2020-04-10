@@ -16,6 +16,7 @@ class Node:
         for s, a in child_saps:
             node = Node(s, a, not self.player)
             if node in self.children:
+                del node
                 continue
             else:
                 self.children.append(node)

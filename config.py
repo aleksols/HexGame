@@ -3,14 +3,17 @@ from tensorflow.keras.layers import Dense
 general = {
     "size": 4,
     "starting player": 1,
-    "simulations": 500
+    "simulations": 50,
+    "actual games": 200,
+    "num anets": 5
 }
 
 
 network = {
-    "layers": [Dense, Dense, Dense],
-    "dimensions": [general["size"] ** 2 + 1, 64, 32, general["size"] ** 2],
-    "activations": ["relu", "relu", "softmax"],
+    "layers": [Dense, Dense],
+    "dimensions": [64, general["size"] ** 2],
+    "activations": ["relu", "softmax"],
     "optimizer": "adam",
-    "loss": "categorical_crossentropy"
+    "loss": "categorical_crossentropy",
+    "batch size": 32
 }
