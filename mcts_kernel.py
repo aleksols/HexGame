@@ -3,13 +3,13 @@ import random
 
 import numpy as np
 
-from state_manager import StateManager
+from board import Board
 from node import Node
 
 
 class MCTS:
-    def __init__(self, state_manager: StateManager, c, anet):
-        self.state_manager = state_manager
+    def __init__(self, board: Board, c, anet):
+        self.board = board
         self.c = c
         self.anet = anet
 
@@ -30,26 +30,26 @@ class MCTS:
         return node.children[best_child]
 
     def tree_search(self, root: Node):
-        self.state_manager.set_state(root.state, root.player)
-        while not self.state_manager.finished:
+        self.board.set_state(root.state)
+        while not self.board.finished:
             if not root.expanded:
-                new_node = root.expand(self.state_manager.generate_child_states())
+                new_node = root.expand(self.board.generate_child_states())
                 return new_node
             root = self.select_node(root, self.c)
-            self.state_manager.set_state(root.state, root.player)
+            self.board.set_state(root.state, root.player)
         return root
 
     def rollout(self, current_node: Node):
-        self.state_manager.set_state(current_node.state, current_node.player)
-        while not self.state_manager.finished:
+        self.board.set_state(current_node.state, current_node.player)
+        while not self.board.finished:
             action = self.default_policy()
-            self.state_manager.apply_action(action)
-        if self.state_manager.player:
+            self.board.play(action)
+        if self.board.player:
             return -1
         return 1
 
     def default_policy(self):
-        return random.choice(self.state_manager.generate_child_states())[1]
+        return random.choice(self.board.generate_child_states())[1]
 
     def backprop(self, leaf_node: Node, z):
         while leaf_node is not None:

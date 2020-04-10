@@ -18,14 +18,12 @@ def main():
     for game in tqdm(range(config.general["actual games"])):
         actual_board.reset()
 
-
-        state_manager = StateManager(mc_board)
-        mct = MCTS(state_manager, c=1, anet=anet)
+        mct = MCTS(mc_board, c=1, anet=anet)
         root = Node(state_manager.game_state, None, state_manager.player)
 
-        while not actual_board.final_state:
+        while not actual_board.finished:
             mc_board.set_state(actual_board.state)
-            state_manager.set_state(root.state, root.player)
+            # state_manager.set_state(root.state, root.player)
             mct.search(config.general["simulations"], root)
             D = [child.visits / root.visits for child in root.children]
             replay_buffer.save(root.state, D)

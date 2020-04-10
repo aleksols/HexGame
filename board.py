@@ -13,6 +13,8 @@ class Board:
 
         self.player = starting_player
         self.stones_places = 0
+        self.p1_cells = {"rows": set()}
+        self.p2_cells = {"columns": set()}
 
     def init_cells_v2(self):
         col_vector = np.array([1, -1])
@@ -37,32 +39,131 @@ class Board:
                     cell.add_neighbour(self.coord_repr[coord])
 
     def set_state(self, state):
-        for i, s in enumerate(state):
-            self.cells[i].set_state(s)
+        self.player = state[0]
+        for i, s in enumerate(state[1:]):
+            self.cells[i].occupy(s)
 
     def reset(self):
         for cell in self.cells:
-            cell.player = None
+            cell.clear()
+
+    def generate_child_states(self):
+        child_saps = []
+        for action in self.valid_actions:
+            current_state = self.state
+            current_state[0] = self.next_player
+            current_state[action + 1] = self.player
+            child_saps.append((current_state, action))
+        return child_saps
 
     def play(self, action):
-        # TODO implement
-        return None
+        if action not in self.valid_actions:
+            raise ValueError(f"{action} is not a legal action i state {self.state}")
+        chosen_cell = self.cells[action]
+        chosen_cell.occupy(self.player)
+        self.player = self.next_player
+
+    @property
+    def next_player(self):
+        if self.player == 1:
+            return 2
+        return 1
 
     @property
     def valid_actions(self):
-        # TODO maybe move to state manager
-        return [i if cell.player is None else 2 for i, cell in enumerate(self.cells)]
+        return [i for i, cell in enumerate(self.cells) if cell.player is None]
 
     @property
     def state(self):
-        # TODO implement player into state and use in play as well
-        return self.cells.copy()
+        return [self.player] + [cell.state for cell in self.cells]
 
     @property
-    def final_state(self):
-        return True
+    def finished(self):
+        # if not self.valid_actions:
+        #     return True
+
+        # Previous and next player are the same, only the previous player could have won
+        finished_player = self.next_player
+        return self._player_one_finished() if finished_player == 1 else self._player_two_finished()
+
+    def _player_one_finished(self):
+        p1_cells = set()  # Use set because the "in" function is O(1) average for set and O(n) average for list
+        rows = set()
+        frontier = []
+        for cell in filter(lambda x: x.player == 1, self.cells):
+            p1_cells.add(cell)
+            rows.add(cell.row)
+            if cell.row == 0:
+                frontier.append(cell)
+
+        # Hopefully this will reduce runtime
+        for row in range(self.size):
+            if row not in rows:
+                return False
+
+        closed = set()
+        while frontier:
+            cell = frontier.pop(0)
+            for neighbour in cell.neighbours:
+                if neighbour in p1_cells and neighbour not in closed:
+                    frontier.append(neighbour)
+                    if neighbour.row == self.size - 1:
+                        # print("p1 win")
+                        return True
+            closed.add(cell)
+        return False
+
+    def _player_two_finished(self):
+        p2_cells = set()  # Use set because the "in" function is O(1) average for set and O(n) average for list
+        columns = set()
+        frontier = []
+        for cell in filter(lambda x: x.player == 2, self.cells):
+            p2_cells.add(cell)
+            columns.add(cell.column)
+            if cell.column == 0:
+                frontier.append(cell)
+
+        # Hopefully this will reduce runtime
+        for col in range(self.size):
+            if col not in columns:
+                return False
+
+        closed = set()
+        while frontier:
+            cell = frontier.pop(0)
+            for neighbour in cell.neighbours:
+                if neighbour in p2_cells and neighbour not in closed:
+                    frontier.append(neighbour)
+                    if neighbour.column == self.size - 1:
+                        # print("p2 win")
+                        return True
+            closed.add(cell)
+        return False
+
 
 if __name__ == '__main__':
-    b = Board(4)
-    print(b.valid_actions)
-    b.set_state([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0])
+    import time
+    start = time.time()
+    b = Board(4, 1)
+    s1 = b.state
+    print("State", b.state)
+    import random
+
+    # p1_actions = [0, 2, 4, 6, 8]
+    # p2_actions = [1, 2, 3, 5, 7]
+    # actions = []
+    # for p1, p2 in zip(p1_actions, p2_actions):
+    #     actions += [p1, p2]
+    # actions = [0, 3, 4, 1, 7, 6, 5, 8, 2]
+    for i in range(1000):
+        while not b.finished:
+            # if actions:
+            # b.play(actions.pop(0))
+            # else:
+            #     print("Using random")
+            b.play(random.choice(b.valid_actions))
+            # print(b.state)
+        # for i in range(1, b.size ** 2, b.size):
+        #     print(b.state[i: i + b.size])
+        b.reset()
+    print(time.time() - start)

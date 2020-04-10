@@ -3,6 +3,7 @@ from tensorflow.keras.layers import Dense
 general = {
     "size": 4,
     "starting player": 1,
+    "simulations": 500
 }
 
 

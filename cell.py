@@ -20,28 +20,35 @@ class Cell:
     def color(self):
         if self.player is None:
             return "white"
-        if self.player is True:
-            return "black"
+        if self.player == 1:
+            return "red"
         return "red"
 
     @property
     def state(self):
         if self.player is None:
+            return 0
+        return self.player
+
+    @property
+    def nn_state(self):
+        if self.player is None:
             return (0, 0)  # Empty cell
-        if self.player is True:
+        if self.player == 1:
             return (0, 1)  # Player 1 occupies the cell
         return (1, 0)  # Player 2 occupies the cell
 
-    def set_state(self, state):
-        if state[0]:
-            self.player = False
-        elif state[1]:
-            self.player = True
-        else:
+    def occupy(self, player):
+        if player == 0:
             self.player = None
+        else:
+            self.player = player
+
+    def clear(self):
+        self.player = None
 
     def __hash__(self):
-        return self.index
+        return hash(self.index) + hash(self.player)
 
     def __str__(self):
         return str(self.index)
