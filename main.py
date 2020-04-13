@@ -3,7 +3,7 @@ from board import Board
 from mcts_kernel import MCTS
 from node import Node
 from replay_buffer import ReplayBuffer
-from anet import ANET
+from anet import TFImplementation
 from state_manager import StateManager
 from tqdm import tqdm
 import numpy as np
@@ -13,7 +13,7 @@ import concurrent.futures
 def train():
     i = config.general["actual games"] // (config.general["num anets"] - 1)
     replay_buffer = ReplayBuffer()
-    anet = ANET()
+    anet = TFImplementation()
     anet.save("models/anet_0.h5")
     anet.summary()
 

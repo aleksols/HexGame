@@ -56,34 +56,20 @@ class MCTS:
         return 1
 
     def default_policy(self):
-        # start = time.time()
-        # prediction = self.anet.predict([self.board.state], batch_size=1)[0]
-        time.sleep(0.002)
-        return random.choice(self.board.valid_actions)
-        # pred = time.time() - start
-        # start = time.time()
+        prediction = self.anet.predict(self.board.state, )
+
         valid_actions = self.board.valid_actions
-        # get_valid = time.time() - start
-        # start = time.time()
+
         dist = [0 for _ in range(len(prediction))]
         for i in valid_actions:
             dist[i] = prediction[i]
 
         dist = normalize([dist], norm="l1")[0]
-        # get_dist = time.time() - start
-        # start = time.time()
-        # print(self.board.state)
-        # print(dist)
-        # print(valid_actions)
-        # print(sum(dist))
+
         action = np.random.choice(range(len(prediction)), p=dist)
-        # get_random = time.time() - start
-        # print(pred, get_valid, get_dist, get_random)
-        # print(action)
-        del prediction
-        del valid_actions
-        del dist
-        # exit()
+        # del prediction
+        # del valid_actions
+        # del dist
         return action
 
 

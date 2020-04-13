@@ -5,7 +5,8 @@ general = {
     "starting player": 1,
     "simulations": 50,
     "actual games": 200,
-    "num anets": 5
+    "num anets": 5,
+    "tournament games": 25
 }
 
 

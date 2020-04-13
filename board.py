@@ -10,7 +10,7 @@ class Board:
         self.size = size
         self.coord_repr = {}  # A coordinate based representation of cells
         self.init_cells_v2()
-
+        self.starting_player = starting_player
         self.player = starting_player
         self.stones_places = 0
         self.p1_cells = {"rows": set()}
@@ -46,6 +46,7 @@ class Board:
     def reset(self):
         for cell in self.cells:
             cell.clear()
+        self.player = self.starting_player
 
     def generate_child_states(self):
         child_saps = []
