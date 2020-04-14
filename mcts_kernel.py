@@ -1,14 +1,8 @@
 import math
-import random
-
 import numpy as np
-
 from board import Board
 from node import Node
 from sklearn.preprocessing import normalize
-from tqdm import tqdm
-import time
-import gc
 
 class MCTS:
     def __init__(self, board: Board, c, anet):
@@ -51,22 +45,17 @@ class MCTS:
         while not self.board.finished:
             action = self.default_policy()
             self.board.play(action)
-        if self.board.player == 2:
+        if self.board.next_player == 2:
             return -1
         return 1
 
     def default_policy(self):
         prediction = self.anet.forward(self.board.state)[0]
-        # print("predicted", prediction)
-
         valid_actions = self.board.valid_actions
-
         dist = [0 for _ in range(len(prediction))]
         for i in valid_actions:
             dist[i] = prediction[i]
-
         dist = normalize([dist], norm="l1")[0]
-
         action = np.random.choice(range(len(prediction)), p=dist)
         # del prediction
         # del valid_actions
