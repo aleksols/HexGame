@@ -56,7 +56,8 @@ class MCTS:
         return 1
 
     def default_policy(self):
-        prediction = self.anet.predict(self.board.state, )
+        prediction = self.anet.forward(self.board.state)[0]
+        # print("predicted", prediction)
 
         valid_actions = self.board.valid_actions
 

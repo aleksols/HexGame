@@ -3,8 +3,7 @@ from board import Board
 from mcts_kernel import MCTS
 from node import Node
 from replay_buffer import ReplayBuffer
-from anet import TFImplementation
-from state_manager import StateManager
+from anet import ANET_v2
 from tqdm import tqdm
 import numpy as np
 import concurrent.futures
@@ -13,14 +12,14 @@ import concurrent.futures
 def train():
     i = config.general["actual games"] // (config.general["num anets"] - 1)
     replay_buffer = ReplayBuffer()
-    anet = TFImplementation()
-    anet.save("models/anet_0.h5")
-    anet.summary()
+    anet = ANET_v2()
+    anet.save(0)
+    # anet.summary()
 
-    n_threads = 8
-    sims_per_thread = config.general["simulations"] // n_threads
-    rest = config.general["simulations"] % n_threads
-    num_sims = [sims_per_thread] * (n_threads - 1) + [sims_per_thread + rest]
+    # n_threads = 8
+    # sims_per_thread = config.general["simulations"] // n_threads
+    # rest = config.general["simulations"] % n_threads
+    # num_sims = [sims_per_thread] * (n_threads - 1) + [sims_per_thread + rest]
 
     actual_board = Board(config.general["size"], starting_player=1)
     mc_board = Board(config.general["size"], starting_player=1)
@@ -46,10 +45,10 @@ def train():
             root.parent = None
             root.edge_action = None
 
-        x, y = replay_buffer.get_random_minibatch(config.network["batch size"])
-        anet.fit(x, y, verbose=1)
+        batch = replay_buffer.get_random_minibatch(config.network["batch size"])
+        anet.train_model(batch, 3)
         if game % i == 0:
-            anet.save(f"models/anet_{game}.h5")
+            anet.save(game)
 
 if __name__ == '__main__':
     train()

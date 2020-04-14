@@ -2,7 +2,7 @@ import tensorflow as tf
 import torch
 
 from agent import Agent
-from anet import TorchImplementation, TFImplementation
+from anet import ANET_v2
 from board import Board
 
 
@@ -13,14 +13,9 @@ def get_model_path(filetype):
 def get_agents(anet_type):
 
     agents = {}
-    if anet_type == "tf":
-        model_paths = get_model_path("h5")
-        for path in model_paths:
-            agents[path] = Agent(TFImplementation.load(path))
-    else:
-        model_paths = get_model_path("dat")
-        for path in model_paths:
-            agents[path] = Agent(TorchImplementation.load(path))
+    model_paths = get_model_path("dat")
+    for path in model_paths:
+        agents[path] = Agent(TorchImplementation.load(path))
 
     return agents
 

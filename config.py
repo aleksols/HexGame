@@ -1,4 +1,4 @@
-from tensorflow.keras.layers import Dense
+
 
 general = {
     "size": 4,
@@ -11,9 +11,8 @@ general = {
 
 
 network = {
-    "layers": [Dense, Dense],
-    "dimensions": [64, general["size"] ** 2],
-    "activations": ["relu", "softmax"],
+    "dimensions": [general["size"] ** 2 + 1, 64, 64, general["size"] ** 2],
+    "activations": ["relu", "relu", "softmax"],
     "optimizer": "adam",
     "loss": "categorical_crossentropy",
     "batch size": 32

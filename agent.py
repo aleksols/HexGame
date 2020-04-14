@@ -9,7 +9,7 @@ class Agent:
     def best_action(self, valid_actions, state):
         if self.policy == "random":
             return np.random.choice(valid_actions)
-        pred = self.anet.predict(state)[0]
+        pred = self.anet.forward(state)[0]
         dist = [0 for _ in range(len(pred))]
         for i in valid_actions:
             dist[i] = pred[i]
