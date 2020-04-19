@@ -64,6 +64,17 @@ class Board:
         chosen_cell.occupy(self.player)
         self.player = self.next_player
 
+    def get_neighbour_pairs(self):
+        pairs = []
+        finished = []
+        for cell in self.cells:
+            for neighbour in cell.neighbours:
+                if neighbour in finished:
+                    continue
+                pairs.append((cell, neighbour))
+            finished.append(cell)
+        return pairs
+
     @property
     def next_player(self):
         if self.player == 1:
@@ -77,6 +88,23 @@ class Board:
     @property
     def state(self):
         return [self.player] + [cell.state for cell in self.cells]
+
+    @property
+    def nn_state(self):
+        state = self.state
+        nn_state = []
+        for s in state:
+            if s == 1:
+                nn_state += [0, 1]
+            elif s == 2:
+                nn_state += [1, 0]
+            else:
+                nn_state += [0, 0]
+        return nn_state
+
+    def pretty_state(self):
+        for i in range(0, len(self.cells), self.size):
+            print([c.state for c in self.cells[i: i + self.size]])
 
     @property
     def finished(self):

@@ -6,14 +6,16 @@ class Agent:
         self.anet = anet
         self.policy = policy
 
-    def best_action(self, valid_actions, state):
+    def best_action(self, valid_actions, state, verbose=False):
         if self.policy == "random":
             return np.random.choice(valid_actions)
-        pred = self.anet.forward(state)[0]
+        pred = self.anet.predict(state)
         dist = [0 for _ in range(len(pred))]
         for i in valid_actions:
             dist[i] = pred[i]
         dist = normalize([dist], norm="l1")[0]
+        if verbose:
+            print(dist)
         if self.policy == "greedy":
             return np.argmax(dist)  # Index in dist represents an action
         return np.random.choice(range(len(pred)), p=dist)

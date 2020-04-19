@@ -22,7 +22,7 @@ class Cell:
             return "white"
         if self.player == 1:
             return "red"
-        return "red"
+        return "black"
 
     @property
     def state(self):
@@ -33,10 +33,10 @@ class Cell:
     @property
     def nn_state(self):
         if self.player is None:
-            return (0, 0)  # Empty cell
+            return [0, 0]  # Empty cell
         if self.player == 1:
-            return (0, 1)  # Player 1 occupies the cell
-        return (1, 0)  # Player 2 occupies the cell
+            return [0, 1]  # Player 1 occupies the cell
+        return [1, 0]  # Player 2 occupies the cell
 
     def occupy(self, player):
         if player == 0:
