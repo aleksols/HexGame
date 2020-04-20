@@ -80,7 +80,7 @@ def train():
     plt.plot(losses)
     avg = [losses[0]]
     for i in range(1, len(losses)):
-        avg.append((sum(avg) + losses[i]) / (len(avg) + 1))
+        avg.append((sum(avg[-9:]) + losses[i]) / (min(10, len(avg) + 1)))
     plt.plot(avg)
     plt.show()
 

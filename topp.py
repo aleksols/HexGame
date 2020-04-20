@@ -61,6 +61,7 @@ def tournament():
                 visual = game in config.tournament["visualize"]
                 # print(agent1, "playing", agent2)
                 # print(agents[agent1].anet)
+                visual = agent1 == "test_adam3_anet_200" and game == 1
                 a1_score, a2_score, seq = play_single(agents[agent1], agents[agent2], game % 2 + 1, visual)
                 if game % 2 == 0:
                     detailed[(agent1, "starting")] += a1_score
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     import pickle
     # ts = pickle.load(open("buffers/3", "rb"))
     # print(len(ts))
-    play_manually()
+    # play_manually()
     scores, detailed = tournament()
     for agent, score in detailed.items():
         print(f"{agent}:", score)
