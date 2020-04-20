@@ -1,11 +1,13 @@
 import math
-from client_side.BasicClientActorAbs import BasicClientActorAbs
+from BasicClientActorAbs import BasicClientActorAbs
+from anet import ANET
 
 class BasicClientActor(BasicClientActorAbs):
 
     def __init__(self, IP_address=None, verbose=True):
         self.series_id = -1
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
+        self.net = ANET.load("OHT/")
 
     def handle_get_action(self, state):
         """

@@ -27,9 +27,9 @@ def play_single(agent1, agent2, starting_player=1, visual=False):
     while not board.finished:
         state = board.nn_state
         if board.player == 1:
-            action = agent1.best_action(board.valid_actions, state)
+            action = agent1.best_action(board.valid_actions, state, verbose=False)
         else:
-            action = agent2.best_action(board.valid_actions, state)
+            action = agent2.best_action(board.valid_actions, state, verbose=False)
         action_sequence.append(action)
         board.play(action)
     if visual:
@@ -41,10 +41,12 @@ def play_single(agent1, agent2, starting_player=1, visual=False):
 
 def tournament():
     agents = get_agents(config.tournament["agent policies"])
+    detailed = {}
     scores = {}
     for a in agents.keys():
-        scores[(a, "starting")] = 0
-        scores[(a, "not starting")] = 0
+        detailed[(a, "starting")] = 0
+        detailed[(a, "not starting")] = 0
+        scores[a] = 0
     # scores = {(a, "starting"): 0, (a,"not starting"): 0 for a in agents.keys()}
 
     num_games = config.tournament["games"]
@@ -57,19 +59,21 @@ def tournament():
                 continue
             for game in range(1, num_games + 1):
                 visual = game in config.tournament["visualize"]
-                print(agent1, "playing", agent2)
-                print(agents[agent1].anet)
+                # print(agent1, "playing", agent2)
+                # print(agents[agent1].anet)
                 a1_score, a2_score, seq = play_single(agents[agent1], agents[agent2], game % 2 + 1, visual)
                 if game % 2 == 0:
-                    scores[(agent1, "starting")] += a1_score
-                    scores[(agent2, "not starting")] += a2_score
+                    detailed[(agent1, "starting")] += a1_score
+                    detailed[(agent2, "not starting")] += a2_score
                 else:
-                    scores[(agent1, "not starting")] += a1_score
-                    scores[(agent2, "starting")] += a2_score
-    return scores
+                    detailed[(agent1, "not starting")] += a1_score
+                    detailed[(agent2, "starting")] += a2_score
+                scores[agent1] += a1_score
+                scores[agent2] += a2_score
+    return scores, detailed
 
 def play_manually():
-    agent = get_agents()["3_anet_200"]
+    agent = get_agents("greedy")["test_adam3_anet_200"]
     board = Board(config.game["size"], 1)
     action_sequence = []
     while not board.finished:
@@ -92,13 +96,11 @@ if __name__ == '__main__':
     import pickle
     # ts = pickle.load(open("buffers/3", "rb"))
     # print(len(ts))
-    scores = tournament()
-    for agent, score in scores.items():
+    play_manually()
+    scores, detailed = tournament()
+    for agent, score in detailed.items():
         print(f"{agent}:", score)
-    # play_manually()
-    # agent = get_agents()["train_anet_200"]
-    # state = [1, 2, 2, 2, 1, 0, 1, 2, 0, 0, 1, 0, 0, 1, 0, 0, 0]
-    # board = Board(4, 1)
-    # board.set_state(state)
-    # board.pretty_state()
-    # print(agent.best_action(board.valid_actions, board.nn_state, verbose=True))
+
+    print("\nTotals:")
+    for agent, score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
+        print(f"{agent}:", score)

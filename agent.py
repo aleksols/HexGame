@@ -15,7 +15,8 @@ class Agent:
             dist[i] = pred[i]
         dist = normalize([dist], norm="l1")[0]
         if verbose:
-            print(dist)
+            print("dist", self, dist)
+            print("max", np.argmax(dist))
         if self.policy == "greedy":
             return np.argmax(dist)  # Index in dist represents an action
         return np.random.choice(range(len(pred)), p=dist)

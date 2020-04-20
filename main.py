@@ -9,6 +9,17 @@ from visualize import visualize
 import torch.nn.functional as F
 import torch
 
+def get_actor_network():
+    if config.network["use conv"]:
+        from anet import ConvAnet
+        return ConvAnet()
+    return ANET()
+
+def get_save_interval():
+    i = config.training["actual games"] // (config.training["num anets"] - 1)
+    if i == 0:
+        i = 1
+    return i
 
 def train():
     prompt = input("You are about to start a training session."
@@ -16,15 +27,15 @@ def train():
     if prompt != "yes":
         return
 
-    i = config.training["actual games"] // (config.training["num anets"] - 1)
-    if i == 0:
-        i = 1
+    i = get_save_interval()
     replay_buffer = ReplayBuffer()
-    anet = ANET()
+    anet = get_actor_network()
     anet.save(0)
 
     actual_board = Board(config.game["size"], starting_player=1)
     mc_board = Board(config.game["size"], starting_player=1)
+
+    losses = []
 
     for game in tqdm(range(1, config.training["actual games"] + 1)):
         actual_board.reset()
@@ -58,11 +69,20 @@ def train():
             visualize(actual_board, action_sequence)
 
         x, y = replay_buffer.get_random_minibatch(config.training["batch size"])
-        anet.train_model(x, y, config.training["epochs"])
-
+        loss = anet.train_model(x, y, config.training["epochs"], verbose=1)
+        losses.append(loss)
         if game % i == 0:
             anet.save(game)
+
+
     replay_buffer.save_to_file()  # For debugging purposes later
+    import matplotlib.pyplot as plt
+    plt.plot(losses)
+    avg = [losses[0]]
+    for i in range(1, len(losses)):
+        avg.append((sum(avg) + losses[i]) / (len(avg) + 1))
+    plt.plot(avg)
+    plt.show()
 
 
 if __name__ == '__main__':

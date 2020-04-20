@@ -4,28 +4,41 @@ game = {
 }
 
 tournament = {
-    "games": 25,
+    "games": 200,
     "agent policies": "probabilistic",  # greedy, probabilistic or random
-    "file prefix": f"{game['size']}",
-    "visualize": [1, 2, 3]
+    "file prefix": f"test_adam{game['size']}",
+    "visualize": []
 }
 
 network = {
-    "dimensions": [2 * game["size"] ** 2 + 2] + [64, 64] + [game["size"] ** 2],
-    "activations": ["relu"] + ["relu", "relu"] + ["softmax"],
+    "h_dims": [64, 64],
+    "activations": ["relu"] * 2,
+    "output func": "softmax",
     "output args": {"dim": 1},
-    "optimizer": "adam",
+    "optim": "adam",
     "loss": "categorical_crossentropy",
-    "learning rate": 0.006
+    "learning rate": 0.001,
+    "use conv": False
 }
 
 training = {
     "batch size": 32,
-    "epochs": 50,
-    "simulations": 50,
-    "actual games": 2000,
+    "epochs": 1,
+    "simulations": 500,
+    "actual games": 200,
     "num anets": 5,
-    "file prefix": f"{game['size']}",
+    "file prefix": f"test_adam{game['size']}",
     "visualize": [],  # What games to visualize. F.eks [1, 50, 200]. 1 indexed
     "buffer max size": 2000
 }
+
+conv_net = {
+    "h_channels": [64],
+    "activations": ["relu"],
+    "output func": "softmax",
+    "output args": {"dim": 1},
+    "optim": "adam",
+    "loss": "categorical_crossentropy",
+    "learning rate": 0.0001,
+}
+
