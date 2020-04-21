@@ -1,13 +1,17 @@
 import math
 from BasicClientActorAbs import BasicClientActorAbs
 from anet import ANET
+from agent import Agent
+from board import Board
 
 class BasicClientActor(BasicClientActorAbs):
 
     def __init__(self, IP_address=None, verbose=True):
         self.series_id = -1
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
-        self.net = ANET.load("OHT/")
+        self.net = ANET.load("OHT/6_anet_200")
+        self.agent = Agent(self.net)
+        self.board = Board(6, 1)
 
     def handle_get_action(self, state):
         """
@@ -20,15 +24,13 @@ class BasicClientActor(BasicClientActorAbs):
         :return: Your actor's selected action as a tuple (row, column)
         """
 
-        # This is an example player who picks random moves. REMOVE THIS WHEN YOU ADD YOUR OWN CODE !!
-        next_move = tuple(self.pick_random_free_cell(
-            state, size=int(math.sqrt(len(state)-1))))
         #############################
-        #
-        #
-        # YOUR CODE HERE
-        #
-        # next_move = ???
+        self.board.set_state(state)
+        self.board.pretty_state()
+        next_move = self.agent.best_action(self.board.valid_actions, self.board.nn_state)
+        row = next_move // 6
+        column = next_move % 6
+        next_move = (row, column)
         ##############################
         return next_move
 
@@ -138,4 +140,5 @@ class BasicClientActor(BasicClientActorAbs):
 
 if __name__ == '__main__':
     bsa = BasicClientActor(verbose=True)
+    # print(bsa.handle_get_action([2] + [0]*36))
     bsa.connect_to_server()
