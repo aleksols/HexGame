@@ -55,27 +55,16 @@ class MCTS:
         return 1
 
     def default_policy(self):
-        # if self.board.state == [1, 1, 0, 0, 0, 0, 0, 0, 0, 2]:
-        #     self.anet.print_weigths()
-
         prediction = self.anet.predict(self.board.nn_state)
         valid_actions = self.board.valid_actions
-        # dist = [0 for _ in range(len(prediction))]
         dist = torch.zeros(len(prediction), dtype=torch.float)
         for i in valid_actions:
             dist[i] = prediction[i]
         dist = normalize(dist, dim=0, p=1)
-        # print("dist", dist)
-        # print("valid", valid_actions)
         if dist.sum() == 0:
             return random.choice(valid_actions)
         action = random.choices(range(len(prediction)), weights=dist.tolist())[0]
-        # if action not in valid_actions:
-        #     print(self.board.nn_state)
-        #     print(prediction.tolist())
-        #     print(dist)
-        #     print(valid_actions)
-        #     self.anet.save("error")
+
         return action
 
 
@@ -85,33 +74,3 @@ class MCTS:
             leaf_node.wins += z
             leaf_node = leaf_node.parent
 
-if __name__ == '__main__':
-    # from anet import ANET
-    # from board import Board
-    # net = ANET.load("models/3_anet_error")
-    # print(net)
-    # b = Board(3, 1)
-    # b.set_state([1, 1, 0, 0, 0, 0, 0, 0, 0, 2])
-    # print(net.predict(b.nn_state))
-    # inn = torch.tensor([b.nn_state], dtype=torch.float)
-    # print("inn", inn)
-    # import pprint
-    # for i, m in enumerate(net.model.modules()):
-    #     if i == 0:
-    #         continue
-    #     print("m", type(m))
-    #     if i % 2:
-    #         print("weights", m.weight)
-    #     inn = m.forward(inn)
-    #     print("result", inn)
-    # pprint.pprint(dir(net.model))
-    population = [0.01, 0.2, 0.4, 0.2, 0.1, 0.09]
-    population = [i * 2 for i in population]
-    print(sum(population))
-    chosen = [0, 0, 0, 0, 0, 0]
-    num = 1000000
-    for i in range(num):
-        c = random.choices(range(len(population)), weights=population)[0]
-        chosen[c] += 1
-    print(chosen)
-    print([c / num for c in chosen])

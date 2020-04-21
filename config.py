@@ -1,5 +1,5 @@
 game = {
-    "size": 5,
+    "size": 6,
     "starting player": 1
 }
 
