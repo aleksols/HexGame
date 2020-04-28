@@ -101,9 +101,9 @@ def play_manually(path, style):
 
 def benchmark():
     import pickle
-    a1 = Agent(ANET.load("models/6/new_best_try_v2_6_anet_600"), "greedy")
+    a1 = Agent(ANET.load("models/6/new_best_try_v2_6_anet_600"), "probabilistic")
     print("a1", a1.anet)
-    a2 = Agent(pickle.load(open("OHT/6_anet_600", "rb")), "random")
+    a2 = Agent(pickle.load(open("working_models/new_best_try6_anet_600", "rb")), "probabilistic")
     print("a2", a2.anet)
     a1_score = 0
     a2_score = 0
@@ -125,7 +125,7 @@ def print_results(scores, details):
 
 
 if __name__ == '__main__':
-    benchmark()
+    # benchmark()
     # play_manually("OHT/6_anet_600", "greedy")
-    # scores, details = tournament()
-    # print_results(scores, details)
+    scores, details = tournament()
+    print_results(scores, details)
