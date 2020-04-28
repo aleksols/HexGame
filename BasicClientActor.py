@@ -9,8 +9,8 @@ class BasicClientActor(BasicClientActorAbs):
     def __init__(self, IP_address=None, verbose=True):
         self.series_id = -1
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
-        self.net = ANET.load("OHT/6_anet_200")
-        self.agent = Agent(self.net)
+        self.net = ANET.load("OHT/95_score")
+        self.agent = Agent(self.net, "greedy")
         self.board = Board(6, 1)
 
     def handle_get_action(self, state):
