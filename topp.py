@@ -1,35 +1,44 @@
 import torch
+from tqdm import tqdm
 
-import config
+from config import TournamentConf, GameConf
 from agent import Agent
 from anet import ANET
-from board import Board
+from board import Board, ResBoard
+from residual_anet import ResNet
+from CnnAnet import ConvAnet
 from visualize import visualize
-
-
-def get_model_path():
-    from os import listdir
-    prefix = config.tournament["file prefix"]
-    return ["models/" + f for f in filter(lambda x: x[:len(prefix)] == prefix, listdir("models/"))]
+from os import listdir
 
 
 def get_agents(policy="probabilistic"):
     agents = {}
-    model_paths = get_model_path()
+    directory = "models/" + TournamentConf.directory + "/"
+    prefix = TournamentConf.file_prefix
+    model_paths = [directory + f for f in filter(lambda x: x[:len(prefix)] == prefix, listdir(directory))]
     for path in model_paths:
-        agents[path.replace("models/", "")] = Agent(ANET.load(path), policy)
+        agents[path.replace(directory, "")] = Agent(ANET.load(path), policy)
     return agents
 
 
 def play_single(agent1, agent2, starting_player=1, visual=False):
-    board = Board(config.game["size"], starting_player)
+    # In case agent1 and agent2 uses different types of neural nets
+    a1_board = Board(GameConf.size, starting_player)
+    a2_board = Board(GameConf.size, starting_player)
+    if isinstance(agent1.anet, ResNet) or isinstance(agent1.anet, ConvAnet):
+        a1_board = ResBoard(GameConf.size, starting_player)
+    if isinstance(agent2.anet, ResNet) or isinstance(agent2.anet, ConvAnet):
+        a2_board = ResBoard(GameConf.size, starting_player)
+
+    board = Board(GameConf.size, starting_player)
     action_sequence = []
     while not board.finished:
-        state = board.nn_state
+        a1_board.set_state(board.state)
+        a2_board.set_state(board.state)
         if board.player == 1:
-            action = agent1.best_action(board.valid_actions, state, verbose=False)
+            action = agent1.best_action(board.valid_actions, a1_board.nn_state, verbose=False)
         else:
-            action = agent2.best_action(board.valid_actions, state, verbose=False)
+            action = agent2.best_action(board.valid_actions, a2_board.nn_state, verbose=False)
         action_sequence.append(action)
         board.play(action)
     if visual:
@@ -40,16 +49,15 @@ def play_single(agent1, agent2, starting_player=1, visual=False):
 
 
 def tournament():
-    agents = get_agents(config.tournament["agent policies"])
+    agents = get_agents(TournamentConf.agent_policies)
     detailed = {}
     scores = {}
     for a in agents.keys():
         detailed[(a, "starting")] = 0
         detailed[(a, "not starting")] = 0
         scores[a] = 0
-    # scores = {(a, "starting"): 0, (a,"not starting"): 0 for a in agents.keys()}
 
-    num_games = config.tournament["games"]
+    num_games = TournamentConf.games
     player_ones = list(agents.keys())
     player_twos = list(agents.keys())
 
@@ -58,10 +66,7 @@ def tournament():
             if agent1 == agent2:
                 continue
             for game in range(1, num_games + 1):
-                visual = game in config.tournament["visualize"]
-                # print(agent1, "playing", agent2)
-                # print(agents[agent1].anet)
-                visual = agent1 == "test_adam3_anet_200" and game == 1
+                visual = game in TournamentConf.visualize
                 a1_score, a2_score, seq = play_single(agents[agent1], agents[agent2], game % 2 + 1, visual)
                 if game % 2 == 0:
                     detailed[(agent1, "starting")] += a1_score
@@ -73,9 +78,10 @@ def tournament():
                 scores[agent2] += a2_score
     return scores, detailed
 
-def play_manually():
-    agent = get_agents("greedy")["test_adam3_anet_200"]
-    board = Board(config.game["size"], 1)
+
+def play_manually(path, style):
+    agent = Agent(ANET.load(path), style)
+    board = Board(GameConf.size, 1)
     action_sequence = []
     while not board.finished:
         print("Player", board.player)
@@ -93,15 +99,33 @@ def play_manually():
         print("Player 2 wins")
 
 
-if __name__ == '__main__':
+def benchmark():
     import pickle
-    # ts = pickle.load(open("buffers/3", "rb"))
-    # print(len(ts))
-    # play_manually()
-    scores, detailed = tournament()
-    for agent, score in detailed.items():
+    a1 = Agent(ANET.load("models/6/new_best_try_v2_6_anet_600"), "greedy")
+    print("a1", a1.anet)
+    a2 = Agent(pickle.load(open("OHT/6_anet_600", "rb")), "random")
+    print("a2", a2.anet)
+    a1_score = 0
+    a2_score = 0
+    num_games = 1000
+    for game in tqdm(range(1, num_games + 1)):
+        res1, res2, seq = play_single(a1, a2, game % 2 + 1, visual=False)
+        a1_score += res1
+        a2_score += res2
+    print("agent1:", a1_score, "agent2:", a2_score)
+
+
+def print_results(scores, details):
+    for agent, score in details.items():
         print(f"{agent}:", score)
 
     print("\nTotals:")
     for agent, score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
         print(f"{agent}:", score)
+
+
+if __name__ == '__main__':
+    benchmark()
+    # play_manually("OHT/6_anet_600", "greedy")
+    # scores, details = tournament()
+    # print_results(scores, details)

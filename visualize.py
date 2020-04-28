@@ -36,7 +36,7 @@ def visualize(board, action_sequence):
             y_end = edge[1].pos[1]
             edge_size = 1
             edge_color = "k-"
-            if edge[0].player == edge[1].player and edge[0].player is not None:
+            if edge[0].player == edge[1].player and edge[0].player != 0:
                 edge_color = "red" if edge[0].player == 1 else "black"
                 edge_size = 4
             board_ax.plot([x_start, x_end], [y_start, y_end], edge_color, linewidth=edge_size, zorder=1)  # Draw black lines between cells

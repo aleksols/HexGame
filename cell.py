@@ -7,7 +7,7 @@ class Cell:
         self.row = row
         self.column = column
 
-        self.player = None
+        self.player = 0
 
     def add_neighbour(self, *args):
         for cell in args:
@@ -18,7 +18,7 @@ class Cell:
 
     @property
     def color(self):
-        if self.player is None:
+        if self.player == 0:
             return "white"
         if self.player == 1:
             return "red"
@@ -26,26 +26,21 @@ class Cell:
 
     @property
     def state(self):
-        if self.player is None:
-            return 0
         return self.player
 
     @property
     def nn_state(self):
-        if self.player is None:
+        if self.player == 0:
             return [0, 0]  # Empty cell
         if self.player == 1:
             return [0, 1]  # Player 1 occupies the cell
         return [1, 0]  # Player 2 occupies the cell
 
     def occupy(self, player):
-        if player == 0:
-            self.player = None
-        else:
-            self.player = player
+        self.player = player
 
     def clear(self):
-        self.player = None
+        self.player = 0
 
     def __hash__(self):
         return hash(self.index) + hash(self.player)

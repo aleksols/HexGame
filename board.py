@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from cell import Cell
+import torch
 
 
 class Board:
@@ -83,7 +84,7 @@ class Board:
 
     @property
     def valid_actions(self):
-        return [i for i, cell in enumerate(self.cells) if cell.player is None]
+        return [i for i, cell in enumerate(self.cells) if cell.player == 0]
 
     @property
     def state(self):
@@ -167,18 +168,82 @@ class Board:
         return False
 
 
+class ResBoard(Board):
+    @property
+    def nn_state(self):
+        # state = torch.zeros(5, 5, 5)
+        # state = torch.zeros(5, self.size, self.size)
+        state = [[[0 for _ in range(self.size)] for _ in range(self.size)] for _ in range(5)]
+        # state = [[[0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0]],
+        #
+        #          [[0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0]],
+        #
+        #          [[0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0]],
+        #
+        #          [[0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0]],
+        #
+        #          [[0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0],
+        #           [0, 0, 0, 0, 0]]]
+        for cell in self.cells:
+            state[2 - cell.player][cell.row][cell.column] = 1
+        for r in range(self.size):
+            for c in range(self.size):
+                state[self.player + 2][r][c] = 1
+        return torch.tensor(state, dtype=torch.float)
+
+
 if __name__ == '__main__':
     import time
+
     start = time.time()
-    b = Board(4, 1)
+    b = ResBoard(6, 1)
     s1 = b.state
     print("State", b.state)
     import random
 
+    # print(b.nn_state.size())
     for i in range(1000):
+        b.set_state(s1)
         while not b.finished:
-
+            nn_state = b.nn_state
             b.play(random.choice(b.valid_actions))
 
         b.reset()
     print(time.time() - start)
+    start = time.time()
+    for _ in range(1000):
+        state = b.nn_state
+        del state
+    end = time.time() - start
+    print(end)
+    start = time.time()
+    for _ in range(1000):
+        state = b.finished
+        del state
+    end = time.time() - start
+    print(end)
+    state = b.state
+    start = time.time()
+    for _ in range(1000):
+        b.set_state(state)
+    end = time.time() - start
+    print(end)

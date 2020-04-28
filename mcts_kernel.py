@@ -74,3 +74,5 @@ class MCTS:
             leaf_node.wins += z
             leaf_node = leaf_node.parent
 
+    def update_eps(self):  # Just so that this method can be called in training loop without problems
+        pass

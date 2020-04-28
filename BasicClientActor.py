@@ -26,11 +26,12 @@ class BasicClientActor(BasicClientActorAbs):
 
         #############################
         self.board.set_state(state)
-        self.board.pretty_state()
+        # self.board.pretty_state()
         next_move = self.agent.best_action(self.board.valid_actions, self.board.nn_state)
         row = next_move // 6
         column = next_move % 6
         next_move = (row, column)
+        print("next_move:", next_move)
         ##############################
         return next_move
 
