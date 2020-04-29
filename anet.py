@@ -14,7 +14,6 @@ def custom_cross_entropy(pred, target):
 
 
 class ANET(nn.Module):
-    #  TODO implement missing
     optimizers = {
         "adagrad": torch.optim.Adagrad,
         "adam": torch.optim.Adam,
