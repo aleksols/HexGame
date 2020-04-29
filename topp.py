@@ -17,7 +17,8 @@ def get_agents(policy="probabilistic"):
     prefix = TournamentConf.file_prefix
     model_paths = [directory + f for f in filter(lambda x: x[:len(prefix)] == prefix, listdir(directory))]
     for path in model_paths:
-        agents[path.replace(directory, "")] = Agent(ANET.load(path), policy)
+        agent_name = path.replace(directory, "")
+        agents[agent_name] = Agent(ANET.load(path), policy, agent_name)
     return agents
 
 
@@ -125,7 +126,7 @@ def print_results(scores, details):
 
 
 if __name__ == '__main__':
-    # benchmark()
+    benchmark()
     # play_manually("OHT/6_anet_600", "greedy")
-    scores, details = tournament()
-    print_results(scores, details)
+    # scores, details = tournament()
+    # print_results(scores, details)
