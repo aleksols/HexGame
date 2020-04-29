@@ -2,9 +2,10 @@ from sklearn.preprocessing import normalize
 import numpy as np
 
 class Agent:
-    def __init__(self, anet, policy="probabilistic"):
+    def __init__(self, anet, policy="probabilistic", name=""):
         self.anet = anet
         self.policy = policy
+        self.name = name
 
     def best_action(self, valid_actions, state, verbose=False):
         if self.policy == "random":
