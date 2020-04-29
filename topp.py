@@ -63,12 +63,13 @@ def tournament():
     player_ones = list(agents.keys())
     player_twos = list(agents.keys())
 
+    game_id = 1001
     for i, agent1 in enumerate(player_ones[:-1], 1):
         for agent2 in player_twos[i:]:
             if agent1 == agent2:
                 continue
             for game in range(1, num_games + 1):
-                visual = game in TournamentConf.visualize
+                visual = game in TournamentConf.visualize or game_id in TournamentConf.visualize
                 a1_score, a2_score, seq = play_single(agents[agent1], agents[agent2], game % 2 + 1, visual)
                 if game % 2 == 0:
                     detailed[(agent1, "starting")] += a1_score
@@ -78,6 +79,7 @@ def tournament():
                     detailed[(agent2, "starting")] += a2_score
                 scores[agent1] += a1_score
                 scores[agent2] += a2_score
+                game_id += 1
     return scores, detailed
 
 

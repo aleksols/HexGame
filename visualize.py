@@ -63,7 +63,7 @@ def visualize(board, action_sequence, title):
             board_ax.arrow(*arrow, head_width=0.1, head_length=0.1, fc=color, ec=color)
         board_ax.set_title(title)
 
-    ani = animation.FuncAnimation(fig, animate, interval=300, blit=False)
+    ani = animation.FuncAnimation(fig, animate, interval=config.animation_speed, blit=False)
     plt.show()
 
 if __name__ == '__main__':
