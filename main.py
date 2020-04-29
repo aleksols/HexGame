@@ -100,7 +100,7 @@ def train():
             root.edge_action = None
 
         if game in TrainingConf.visualize:
-            visualize(actual_board, action_sequence)
+            visualize(actual_board, action_sequence, f"Game {game}")
 
         training_data = replay_buffer.get_random_minibatch(TrainingConf.batch_size)
         loss = anet.train_model(*training_data, epochs=TrainingConf.epochs, verbose=TrainingConf.verbose)
