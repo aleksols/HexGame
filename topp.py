@@ -43,7 +43,8 @@ def play_single(agent1, agent2, starting_player=1, visual=False):
         action_sequence.append(action)
         board.play(action)
     if visual:
-        visualize(board, action_sequence)
+        title = f"{agent1.name} vs {agent2.name}"
+        visualize(board, action_sequence, title)
     if board.next_player == 1:
         return 1, 0, action_sequence  # agent1 points, agent2 points and action sequence
     return 0, 1, action_sequence
@@ -126,7 +127,7 @@ def print_results(scores, details):
 
 
 if __name__ == '__main__':
-    benchmark()
+    # benchmark()
     # play_manually("OHT/6_anet_600", "greedy")
-    # scores, details = tournament()
-    # print_results(scores, details)
+    scores, details = tournament()
+    print_results(scores, details)

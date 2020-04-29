@@ -24,9 +24,9 @@ class ANET(nn.Module):
 
     activations = {
         "relu": nn.ReLU,
-        "softmax": nn.Softmax,
         "sigmoid": nn.Sigmoid,
-        "tanh": nn.Tanh
+        "tanh": nn.Tanh,
+        "softmax": nn.Softmax
     }
 
     losses = {
@@ -48,16 +48,16 @@ class ANET(nn.Module):
     def _init_network(self):
         model = nn.Sequential()
         model.add_module("L0", nn.Linear(2 * GameConf.size ** 2 + 2, self.h_dims[0]))
-        model.add_module("L0_L1", self.activations[self.act_func[0]]())
-        for i in range(len(self.h_dims) - 2):
-            layer_name = f"L{i + 1}"
-            act_name = f"L{i}_L{i + 1}"
-            model.add_module(layer_name, nn.Linear(self.h_dims[i], self.h_dims[i + 1]))
-            model.add_module(act_name, self.activations[self.act_func[i + 1]]())
-        layer_name = f"L{len(self.h_dims)}"
-        act_name = f"output"
-        model.add_module(layer_name, nn.Linear(self.h_dims[-1], GameConf.size ** 2))
-        model.add_module(act_name, self.activations[NetworkConf.output_activation](**NetworkConf.output_args))
+        if self.act_func[0] != "linear":
+            model.add_module("L0_activation", self.activations[self.act_func[0]]())
+        for i in range(1, len(self.h_dims) - 1):
+            layer_name = f"L{i}"
+            act_name = f"L{i}_activation"
+            model.add_module(layer_name, nn.Linear(self.h_dims[i - 1], self.h_dims[i]))
+            if self.act_func[i] != "linear":
+                model.add_module(act_name, self.activations[self.act_func[i]]())
+        model.add_module(f"L{len(self.h_dims)}", nn.Linear(self.h_dims[-1], GameConf.size ** 2))
+        model.add_module("output", self.activations[NetworkConf.output_activation](**NetworkConf.output_args))
         return model
 
     def _init_weights(self):
@@ -122,9 +122,7 @@ class ANET(nn.Module):
 
     @staticmethod
     def load(path):
-        return torch.load(path)#open(path, 'rb'))
-        # print(path)
-        # return pickle.load(open(path, "rb"))
+        return torch.load(path)
 
     def print_weigths(self):
         for m in self.model:
@@ -175,6 +173,8 @@ class ANET(nn.Module):
 if __name__ == '__main__':
     dummy = torch.ones(10, 2 * GameConf.size ** 2 + 2)
     net = ANET()
+    print(net)
+    exit()
     from replay_buffer import ReplayBuffer
     import pickle
     rb = ReplayBuffer(False)

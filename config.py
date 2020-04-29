@@ -1,47 +1,59 @@
 import torch.nn as nn
 import torch
 
-# TODO add pivotals for easy access
+# Pivotals for easy access
+k = 4
+mcts_sims = 5
+mcts_episodes = 10
+mcts_exploration = 1
+learn_rate = 0.008
+layer_conf = [256, 256]
+activation_functions = ["linear", "linear"]
+network_optimizer = "rmsprop"
+number_of_anets = 5
+tournament_games = 25
+visualize_training = [2]
+visualize_tournament = []
 
 class GameConf:
-    size = 5
+    size = k
     starting_player = 1
 
 
 class MctsConf:
-    simulations = 500
-    actual_games = 600
-    c = 1
+    simulations = mcts_sims
+    actual_games = mcts_episodes
+    c = mcts_exploration
     predict_value_eps = 0.5
 
 
 class TrainingConf:
-    num_anets = 5
+    num_anets = number_of_anets
     batch_size = 128
     buffer_max_size = 4000
     epochs = 1
-    visualize = []
+    visualize = visualize_training
     verbose = 1
-    save_directory = f"demo"
+    save_directory = f"demo1"
     file_prefix = f"demo_{GameConf.size}"
 
 
 class TournamentConf:
-    games = 100
+    games = tournament_games
     agent_policies = "probabilistic"
     directory = TrainingConf.save_directory
     file_prefix = TrainingConf.file_prefix
-    visualize = []  # Index of games to be visualized
+    visualize = visualize_tournament  # Index of games to be visualized
 
 
 class NetworkConf:
-    hidden_dims = [256, 256]
-    activations = ["relu"] * 2
+    hidden_dims = layer_conf
+    activations = activation_functions
     output_activation = "softmax"
     output_args = {"dim": 1}
-    optimizer = "adam"
+    optimizer = network_optimizer
     loss = "crossentropy"
-    lr = 0.008
+    lr = learn_rate
     network_type = "linear"  # linear, conv or residual
     predict_value = False
 
