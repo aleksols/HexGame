@@ -6,8 +6,7 @@ import config
 
 matplotlib.use("TkAgg")
 
-def visualize(board, action_sequence):
-    print(action_sequence)
+def visualize(board, action_sequence, title):
     board.reset()
     fig, board_ax = plt.subplots(1, 1)
     fig.set_size_inches(12, 6)
@@ -62,6 +61,7 @@ def visualize(board, action_sequence):
         arrow_colors = ["red", "black", "black", "red"]
         for arrow, color in zip(arrows, arrow_colors):
             board_ax.arrow(*arrow, head_width=0.1, head_length=0.1, fc=color, ec=color)
+        board_ax.set_title(title)
 
     ani = animation.FuncAnimation(fig, animate, interval=300, blit=False)
     plt.show()
