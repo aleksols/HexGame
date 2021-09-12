@@ -49,7 +49,7 @@ class ANET(nn.Module):
         model.add_module("L0", nn.Linear(2 * GameConf.size ** 2 + 2, self.h_dims[0]))
         if self.act_func[0] != "linear":
             model.add_module("L0_activation", self.activations[self.act_func[0]]())
-        for i in range(1, len(self.h_dims) - 1):
+        for i in range(1, len(self.h_dims)):
             layer_name = f"L{i}"
             act_name = f"L{i}_activation"
             model.add_module(layer_name, nn.Linear(self.h_dims[i - 1], self.h_dims[i]))

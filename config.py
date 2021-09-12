@@ -3,17 +3,17 @@ import torch
 
 # Pivotals for easy access
 k = 5
-mcts_sims = 5
-mcts_episodes = 20
+mcts_sims = 10
+mcts_episodes = 15
 mcts_exploration = 1
 learn_rate = 0.008
-layer_conf = [256, 256]
+layer_conf = [128, 128]
 activation_functions = ["relu", "linear"]
-network_optimizer = "adam"
-number_of_anets = 5
-tournament_games = 25
-visualize_training = [2]
-visualize_tournament = [1200]  # ranges [1, tournament_games] for every series or [1001, ->} for game_ids
+network_optimizer = "rmsprop"
+number_of_anets = 4
+tournament_games = 50
+visualize_training = []
+visualize_tournament = []  # ranges [1, tournament_games] for every series or [1001, ->} for game_ids
 animation_speed = 100
 
 class GameConf:
@@ -35,14 +35,14 @@ class TrainingConf:
     epochs = 1
     visualize = visualize_training
     verbose = 1
-    save_directory = f"demo1"
+    save_directory = f"demo"
     file_prefix = f"demo_{GameConf.size}"
 
 
 class TournamentConf:
     games = tournament_games
     agent_policies = "probabilistic"
-    directory = "demo"  # TrainingConf.save_directory
+    directory = TrainingConf.save_directory
     file_prefix = TrainingConf.file_prefix
     visualize = visualize_tournament  # Index of games to be visualized
 
